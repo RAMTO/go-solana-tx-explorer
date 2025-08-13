@@ -5,9 +5,11 @@ A Go-based command-line tool for monitoring and analyzing Solana blockchain tran
 ## Features
 
 - **Real-time Transaction Monitoring**: Fetches and displays recent transactions for any Solana wallet address
+- **Beautiful Console Visualization**: Pretty-formatted tables with colors and structured layouts using go-pretty
 - **Detailed Transaction Analysis**: Shows transaction signatures, slots, timestamps, fees, status, and instruction counts
 - **Environment-based Configuration**: Securely manages RPC URLs and wallet addresses through environment variables
-- **Clean Output Format**: Well-formatted transaction logs with timestamps and structured data
+- **Interactive Summary Tables**: Overview table showing all transactions with key metrics at a glance
+- **Detailed Transaction Views**: In-depth analysis of individual transactions with formatted sections
 
 ## Prerequisites
 
@@ -45,7 +47,31 @@ A Go-based command-line tool for monitoring and analyzing Solana blockchain tran
 
 ### Constants
 
-- `TRANSACTIONS_LIMIT`: Number of recent transactions to fetch (default: 20)
+- `TRANSACTIONS_LIMIT`: Number of recent transactions to fetch (default: 5)
+
+### New Console Visualization Features
+
+The application now uses the **go-pretty** library to provide beautiful console output:
+
+- **📊 Transaction Summary Table**: Overview of all transactions with status, fees, and balance changes
+- **💰 Transaction Meta Information**: Detailed fee analysis, compute units, and status
+- **📋 Balance Changes**: SOL balance changes with color-coded positive/negative values
+- **🪙 Token Information**: Token balance details and mint addresses
+- **📝 Program Logs**: Execution logs from Solana programs
+- **🔑 Account Keys**: Transaction account participants
+- **⚙️ Instructions**: Program instructions with data sizes
+
+### Output Customization
+
+You can customize the output detail level by modifying the `TransactionFormatter`:
+
+```go
+// For detailed output (shows all data)
+formatter := NewTransactionFormatter(true)
+
+// For concise output (limited data)
+formatter := NewTransactionFormatter(false)
+```
 
 ## Usage
 

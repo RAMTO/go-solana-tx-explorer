@@ -1,5 +1,5 @@
 package main
 
 const (
-	TRANSACTIONS_LIMIT = 20
+	TRANSACTIONS_LIMIT = 5
 )
