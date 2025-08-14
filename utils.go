@@ -43,3 +43,36 @@ func GetWalletAddress() string {
 	}
 	return walletAddr
 }
+
+// GetWSURL returns the WebSocket RPC URL. If WS_URL is not set, it tries to
+// derive it from RPC_URL by replacing the scheme with wss:// when possible.
+func GetWSURL() string {
+	err := godotenv.Load()
+	if err != nil {
+		log.Printf("Warning: Error loading .env file: %v", err)
+	}
+
+	wsURL := os.Getenv("WS_URL")
+	if wsURL != "" {
+		return wsURL
+	}
+	httpURL := os.Getenv("RPC_URL")
+	if httpURL == "" {
+		log.Fatal("WS_URL or RPC_URL environment variable is required")
+	}
+	// naive derive: support https:// → wss://, http:// → ws://
+	if len(httpURL) >= 8 && httpURL[:8] == "https://" {
+		return "wss://" + httpURL[8:]
+	}
+	if len(httpURL) >= 7 && httpURL[:7] == "http://" {
+		return "ws://" + httpURL[7:]
+	}
+	// if already ws/wss, return as-is
+	if len(httpURL) >= 6 && httpURL[:6] == "wss://" {
+		return httpURL
+	}
+	if len(httpURL) >= 5 && httpURL[:5] == "ws://" {
+		return httpURL
+	}
+	return httpURL
+}

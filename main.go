@@ -37,4 +37,16 @@ func main() {
 	if err := portfolioService.PrintUserTokens(ctx, account); err != nil {
 		log.Printf("Error printing user tokens: %v", err)
 	}
+
+	// Start a WS listener to stream new transactions mentioning the wallet.
+	// Uses WS_URL if set; otherwise derives from RPC_URL.
+	go func() {
+		wsURL := GetWSURL()
+		if err := ListenWalletTransactions(ctx, wsURL, account); err != nil {
+			log.Printf("WS listener error: %v", err)
+		}
+	}()
+
+	// Keep the process alive briefly so we can observe events in this demo.
+	select {}
 }
