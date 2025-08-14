@@ -12,6 +12,7 @@ func main() {
 	client := rpc.New(rpcURL)
 	ctx := context.Background()
 	transactionService := NewTransactionService(client)
+	portfolioService := NewUserPortfolioService(client)
 
 	accountsToMonitor := GetWalletAddress()
 
@@ -31,5 +32,9 @@ func main() {
 		transactionService.AnalyzeTransactions(accountTxs)
 	} else {
 		log.Printf("No recent transactions found for account: %s", account.String())
+	}
+
+	if err := portfolioService.PrintUserTokens(ctx, account); err != nil {
+		log.Printf("Error printing user tokens: %v", err)
 	}
 }

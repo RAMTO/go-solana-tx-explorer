@@ -359,3 +359,51 @@ func (f *TransactionFormatter) formatInstructions(instructions []solana.Compiled
 	instrTable.SetStyle(table.StyleLight)
 	fmt.Println(instrTable.Render())
 }
+
+// FormatUserPortfolio displays a pretty table for a slice of token holdings.
+func (f *TransactionFormatter) FormatUserPortfolio(owner solana.PublicKey, tokens []TokenHolding) {
+	fmt.Printf("\n%s\n", text.Colors{text.BgHiBlue, text.FgBlack}.Sprint(" USER TOKEN PORTFOLIO "))
+	fmt.Printf("Owner: %s\n\n", text.Colors{text.FgHiCyan}.Sprint(owner.String()))
+
+	t := table.NewWriter()
+	t.SetTitle("SPL Token Holdings")
+	t.AppendHeader(table.Row{"#", "Name", "Symbol", "Mint", "Amount (UI)", "Decimals"})
+
+	nonZero := 0
+	for i, h := range tokens {
+		if h.UiAmount == "" || h.UiAmount == "0" || h.UiAmount == "0.0" || h.UiAmount == "0.00" {
+			continue
+		}
+		name := h.Name
+		if name == "" {
+			name = "—"
+		}
+		symbol := h.Symbol
+		if symbol == "" {
+			symbol = "—"
+		}
+		shortMint := h.Mint
+		if len(shortMint) > 16 {
+			shortMint = shortMint[:8] + "..." + shortMint[len(shortMint)-8:]
+		}
+		t.AppendRow(table.Row{i + 1, name, symbol, shortMint, h.UiAmount, h.Decimals})
+		nonZero++
+	}
+
+	if nonZero == 0 {
+		fmt.Println(text.Colors{text.FgHiYellow}.Sprint("No non-zero token balances found."))
+		return
+	}
+
+	// Modern minimal style: thin borders, subtle separators, high-contrast header
+	st := table.StyleLight
+	st.Color.Header = text.Colors{text.FgHiWhite, text.BgBlack}
+	st.Color.Row = text.Colors{text.FgHiWhite}
+	st.Color.RowAlternate = text.Colors{text.FgWhite}
+	t.SetStyle(st)
+	t.Style().Options.SeparateRows = false
+	t.Style().Options.DrawBorder = true
+	t.Style().Box = table.StyleBoxLight
+
+	fmt.Println(t.Render())
+}
